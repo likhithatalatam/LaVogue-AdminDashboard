@@ -847,3 +847,353 @@ table tbody tr td {
   height: 39px;
   border: 1px solid black;
 }
+.admin-login-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f7f7f7;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.admin-login-box {
+  width: 100%;
+  max-width: 420px;
+  background-color: white;
+  padding: 45px 40px;
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+}
+
+.admin-login-box h2 {
+  margin: 0;
+  text-align: center;
+  font-size: 32px;
+  letter-spacing: 3px;
+  font-weight: 600;
+  color: #111;
+}
+
+.admin-login-box h3 {
+  margin: 10px 0 30px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  color: #555;
+}
+
+.admin-login-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.admin-login-box input {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid #ddd;
+  background-color: #fafafa;
+  outline: none;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: 0.3s ease;
+}
+
+.admin-login-box input:focus {
+  border-color: #a07adc;
+  background-color: white;
+}
+
+.admin-login-box button {
+  width: 100%;
+  padding: 13px;
+  margin-top: 5px;
+  border: none;
+  border-radius: 3px;
+  background-color: #111;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.admin-login-box button:hover {
+  background-color: #a07adc;
+}
+
+.admin-login-box button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.home-section {
+  padding: 30px 32px 40px;
+  background-color: #fff;
+  min-height: calc(100vh - 130px);
+  box-sizing: border-box;
+}
+
+.home-section .add-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #00009c;
+  font-size: 20px;
+  padding-left: 0;
+}
+
+.home-section .add-head i:first-child {
+  font-size: 20px;
+}
+
+.home-section .add-head i:nth-child(2) {
+  font-size: 14px;
+}
+
+.home-section .add-head span {
+  font-size: 20px;
+  color: #00009c;
+}
+
+.home-section > div:nth-child(2) {
+  margin-bottom: 25px !important;
+  padding: 0 !important;
+}
+
+.home-section > div:nth-child(2) h3 {
+  margin: 0 !important;
+  font-size: 24px !important;
+  color: #333 !important;
+  font-weight: 500;
+}
+
+.home-section > div:nth-child(2) p {
+  margin-top: 7px !important;
+  color: #777 !important;
+  font-size: 14px !important;
+}
+
+.home-section > div[style*="border-radius"] {
+  background: #fff !important;
+  border: 1px solid #ddd !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  margin-bottom: 28px !important;
+  overflow: hidden !important;
+}
+
+.home-section > div[style*="border-radius"] > div:first-child {
+  min-height: 54px;
+  padding: 0 !important;
+  background: #dfd0ff !important;
+  border-bottom: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  box-sizing: border-box;
+}
+
+.home-section > div[style*="border-radius"] > div:first-child h5 {
+  margin: 0 !important;
+  padding: 15px 20px !important;
+  font-size: 19px !important;
+  font-weight: 600;
+}
+
+.home-section > div[style*="border-radius"] > div:first-child h5 i {
+  margin-right: 8px;
+}
+
+.home-section > div[style*="border-radius"] > div:first-child small {
+  display: block;
+  padding: 0 20px 12px !important;
+  color: #666 !important;
+  font-size: 12px !important;
+}
+
+.home-section > div[style*="border-radius"] > div:first-child > span {
+  margin-right: 18px;
+  background: #fff !important;
+  color: #00009c !important;
+  padding: 6px 12px !important;
+  border-radius: 20px !important;
+  font-size: 12px !important;
+  white-space: nowrap;
+}
+
+.home-section > div[style*="border-radius"] > div:nth-child(2) {
+  padding: 25px 28px !important;
+  background: #fff !important;
+}
+
+.home-section > div[style*="border-radius"] form > div[style*="grid"] {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 18px 22px !important;
+}
+
+.home-section > div[style*="border-radius"] form > div[style*="grid"] > div {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 7px !important;
+}
+
+.home-section > div[style*="border-radius"] label {
+  color: #111 !important;
+  font-size: 14px !important;
+  font-weight: 500;
+}
+
+.home-section > div[style*="border-radius"] input[type="text"],
+.home-section > div[style*="border-radius"] input[type="number"] {
+  width: 100% !important;
+  min-height: 40px;
+  padding: 9px 12px !important;
+  border: 1px solid #999 !important;
+  border-radius: 5px !important;
+  background: #fff !important;
+  color: #222;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.home-section > div[style*="border-radius"] input[type="text"]:focus,
+.home-section > div[style*="border-radius"] input[type="number"]:focus {
+  border-color: #00009c !important;
+  box-shadow: none !important;
+}
+
+.home-section > div[style*="border-radius"] input[type="file"] {
+  width: 100%;
+  min-height: 40px;
+  padding: 7px 9px;
+  border: 1px solid #999;
+  border-radius: 5px;
+  background: #fff;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.home-section > div[style*="border-radius"] form > button {
+  margin-top: 22px !important;
+  padding: 10px 25px !important;
+  border: none !important;
+  border-radius: 4px !important;
+  background: #000 !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.home-section > div[style*="border-radius"] form > button:hover {
+  background: #a07adc !important;
+}
+
+.home-section > div[style*="border-radius"] h6 {
+  margin-bottom: 15px !important;
+  color: #333 !important;
+  font-size: 15px !important;
+  font-weight: 600;
+}
+
+.home-section > div[style*="border-radius"] table {
+  width: 100% !important;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.home-section > div[style*="border-radius"] table thead th {
+  padding: 13px 10px !important;
+  background: #e9e0f8 !important;
+  color: #111 !important;
+  font-weight: 600;
+  border: 1px solid #fff !important;
+  white-space: nowrap;
+}
+
+.home-section > div[style*="border-radius"] table tbody td {
+  padding: 12px 10px !important;
+  vertical-align: middle !important;
+  border: 1px solid #fff !important;
+  color: #222;
+}
+
+.home-section > div[style*="border-radius"] table tbody tr:nth-child(odd) td {
+  background: #f2f2f2 !important;
+}
+
+.home-section > div[style*="border-radius"] table tbody tr:nth-child(even) td {
+  background: #fff !important;
+}
+
+.home-section > div[style*="border-radius"] table img {
+  border-radius: 3px !important;
+}
+
+.home-section .delete_btn {
+  padding: 5px !important;
+  border: none !important;
+  background: transparent !important;
+  color: #000 !important;
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.home-section .delete_btn:hover {
+  color: #a07adc !important;
+}
+
+.home-section > div[style*="border-radius"] button[style*="borderRadius"] {
+  min-width: 78px;
+}
+
+.home-section
+  > div[style*="border-radius"]
+  > div[style*="gridTemplateColumns"] {
+  padding: 20px 28px !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+}
+
+.home-section
+  > div[style*="border-radius"]
+  > div[style*="gridTemplateColumns"]
+  > div {
+  border: 1px solid #ddd !important;
+  border-radius: 7px !important;
+  background: #fff !important;
+  overflow: hidden !important;
+}
+
+.home-section
+  > div[style*="border-radius"]
+  > div[style*="gridTemplateColumns"]
+  img {
+  width: 100% !important;
+  height: 150px !important;
+  object-fit: cover !important;
+  display: block;
+}
+
+.home-section
+  > div[style*="border-radius"]
+  > div[style*="gridTemplateColumns"]
+  > div
+  > div {
+  padding: 12px !important;
+}
+
+.home-section > div[style*="border-radius"] strong {
+  color: #222;
+  font-size: 14px;
+}
+
+.home-section > div[style*="border-radius"] small {
+  color: #666;
+}

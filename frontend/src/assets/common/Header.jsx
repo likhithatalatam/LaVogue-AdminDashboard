@@ -95,6 +95,12 @@ function AdminHeader() {
                   Orders
                 </Link>
               </li>
+              <li id="contact-messages">
+                <Link to="/contactmessages">
+                  <i className="bi bi-envelope"></i>
+                  Contact Messages
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
