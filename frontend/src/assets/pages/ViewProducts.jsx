@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../css/global.css";
 import AdminHeader from "../common/Header";
 import Footer from "../common/Footer";
-import API from "../../api";
+import API, { getImageUrl } from "../../api";
 import { Link } from "react-router-dom";
 
 function ViewProducts() {
@@ -162,7 +162,7 @@ function ViewProducts() {
                         {pro.images?.map((img, i) => (
                           <img
                             key={i}
-                            src={`http://localhost:5000/uploads/${img}`}
+                            src={getImageUrl(img)}
                             width="60"
                             style={{
                               marginRight: "5px",

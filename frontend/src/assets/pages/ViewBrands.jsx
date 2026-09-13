@@ -3,7 +3,7 @@ import "../css/global.css";
 import AdminHeader from "../common/Header";
 import Footer from "../common/Footer";
 import { Link } from "react-router-dom";
-import API from "../../api";
+import API, { getImageUrl } from "../../api";
 function ViewBrand() {
   const [brands, setbrands] = useState([]);
 
@@ -65,7 +65,7 @@ function ViewBrand() {
                       <td>{brand.brandName}</td>
                       <td>
                         <img
-                          src={`http://localhost:5000/uploads/${brand.brandImage}`}
+                          src={getImageUrl(brand.brandImage)}
                           width="120"
                           height="80"
                           alt=""

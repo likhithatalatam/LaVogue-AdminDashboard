@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../css/global.css";
 import AdminHeader from "../common/Header";
 import Footer from "../common/Footer";
-import API from "../../api";
+import API, { getImageUrl } from "../../api";
 
 function AdminProfile() {
   const [profile, setProfile] = useState({
@@ -16,21 +16,6 @@ function AdminProfile() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
-  const getImageUrl = (image) => {
-    if (!image) {
-      return "/images/6997668-removebg-preview.png";
-    }
-
-    if (image.startsWith("http")) {
-      return image;
-    }
-
-    return `http://localhost:5000/uploads/${image.replace(
-      /^\/?uploads\//,
-      "",
-    )}`;
-  };
 
   const fetchAdminProfile = async () => {
     try {
@@ -181,7 +166,10 @@ function AdminProfile() {
             <div className="card-top">
               <div className="card-profile">
                 <img
-                  src={getImageUrl(profile.profileImage)}
+                  src={
+                    getImageUrl(profile.profileImage) ||
+                    "/images/6997668-removebg-preview.png"
+                  }
                   alt="Admin Profile"
                 />
 

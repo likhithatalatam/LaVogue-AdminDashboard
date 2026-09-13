@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../css/global.css";
 import AdminHeader from "../common/Header";
 import Footer from "../common/Footer";
-import API from "../../api";
+import API, { getImageUrl } from "../../api";
 
 function HomeManagement() {
   const [home, setHome] = useState({
@@ -37,24 +37,6 @@ function HomeManagement() {
   const [couponLink, setCouponLink] = useState("");
   const [couponOrder, setCouponOrder] = useState(0);
 
-  // =====================================================
-  // IMAGE URL
-  // =====================================================
-
-  const getImageUrl = (image) => {
-    if (!image) return "";
-
-    if (image.startsWith("http")) {
-      return image;
-    }
-
-    return `http://localhost:5000/uploads/${image}`;
-  };
-
-  // =====================================================
-  // FETCH HOME SETTINGS
-  // =====================================================
-
   const fetchHomeSettings = async () => {
     try {
       const res = await API.get("/home/settings");
@@ -79,10 +61,6 @@ function HomeManagement() {
   useEffect(() => {
     fetchHomeSettings();
   }, []);
-
-  // =====================================================
-  // ADD CAROUSEL
-  // =====================================================
 
   const handleAddCarousel = async (e) => {
     e.preventDefault();
@@ -123,10 +101,6 @@ function HomeManagement() {
       alert(error.response?.data?.message || "Failed to add carousel slide");
     }
   };
-
-  // =====================================================
-  // ADD MAIN BANNER
-  // =====================================================
 
   const handleAddBanner = async (e) => {
     e.preventDefault();
@@ -170,10 +144,6 @@ function HomeManagement() {
     }
   };
 
-  // =====================================================
-  // ADD COUPON
-  // =====================================================
-
   const handleAddCoupon = async (e) => {
     e.preventDefault();
 
@@ -212,10 +182,6 @@ function HomeManagement() {
     }
   };
 
-  // =====================================================
-  // BEST SELLER SETTINGS
-  // =====================================================
-
   const handleBestSellerUpdate = async () => {
     try {
       const res = await API.put("/home/bestsellers", {
@@ -241,10 +207,6 @@ function HomeManagement() {
       );
     }
   };
-
-  // =====================================================
-  // STATUS
-  // =====================================================
 
   const toggleCarousel = async (item) => {
     try {
@@ -284,10 +246,6 @@ function HomeManagement() {
       alert("Failed to update coupon status");
     }
   };
-
-  // =====================================================
-  // DELETE
-  // =====================================================
 
   const deleteCarousel = async (id) => {
     if (!window.confirm("Delete this carousel slide?")) return;
@@ -333,10 +291,6 @@ function HomeManagement() {
       alert("Failed to delete coupon");
     }
   };
-
-  // =====================================================
-  // COMMON STYLES
-  // =====================================================
 
   const cardStyle = {
     background: "#fff",
@@ -398,10 +352,6 @@ function HomeManagement() {
     fontSize: "12px",
   });
 
-  // =====================================================
-  // LOADING
-  // =====================================================
-
   if (loading) {
     return (
       <>
@@ -422,19 +372,11 @@ function HomeManagement() {
     );
   }
 
-  // =====================================================
-  // UI
-  // =====================================================
-
   return (
     <>
       <AdminHeader />
 
       <div className="home-section">
-        {/* =================================================
-            PAGE HEADER
-        ================================================= */}
-
         <div className="add-head">
           <i className="bi bi-house-door"></i>
 
@@ -470,10 +412,6 @@ function HomeManagement() {
             sellers.
           </p>
         </div>
-
-        {/* =================================================
-            1. TOP CAROUSEL
-        ================================================= */}
 
         <div style={cardStyle}>
           <div style={sectionHeaderStyle}>
@@ -570,8 +508,6 @@ function HomeManagement() {
             </form>
           </div>
 
-          {/* EXISTING SLIDES */}
-
           {home.carouselImages.length > 0 && (
             <div
               style={{
@@ -656,10 +592,6 @@ function HomeManagement() {
             </div>
           )}
         </div>
-
-        {/* =================================================
-            2. MAIN PROMOTIONAL BANNER
-        ================================================= */}
 
         <div style={cardStyle}>
           <div style={sectionHeaderStyle}>
@@ -844,10 +776,6 @@ function HomeManagement() {
           )}
         </div>
 
-        {/* =================================================
-            3. COUPON BANNERS
-        ================================================= */}
-
         <div style={cardStyle}>
           <div style={sectionHeaderStyle}>
             <div>
@@ -1008,10 +936,6 @@ function HomeManagement() {
             </div>
           )}
         </div>
-
-        {/* =================================================
-            4. BEST SELLERS
-        ================================================= */}
 
         <div style={cardStyle}>
           <div style={sectionHeaderStyle}>

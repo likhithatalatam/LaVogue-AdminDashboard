@@ -3,7 +3,7 @@ import "../css/global.css";
 import AdminHeader from "../common/Header";
 import Footer from "../common/Footer";
 import { Link } from "react-router-dom";
-import API from "../../api";
+import API, { getImageUrl } from "../../api";
 
 function ViewCategories() {
   const [categories, setCategories] = useState([]);
@@ -69,7 +69,7 @@ function ViewCategories() {
                       <td>{cat.categoryName}</td>
                       <td>
                         <img
-                          src={`http://localhost:5000/uploads/${cat.categoryImage}`}
+                          src={getImageUrl(cat.categoryImage)}
                           width="120"
                           height="80"
                           alt=""

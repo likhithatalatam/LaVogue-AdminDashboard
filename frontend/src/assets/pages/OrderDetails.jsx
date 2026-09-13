@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../css/global.css";
 import AdminHeader from "../common/Header";
 import Footer from "../common/Footer";
-import API from "../../api";
+import API, { getImageUrl } from "../../api";
 import { useNavigate, useParams } from "react-router-dom";
 
 function OrderDetails() {
@@ -15,10 +15,6 @@ function OrderDetails() {
   const [status, setStatus] = useState("");
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
-  // =====================================================
-  // FETCH ORDER DETAILS
-  // =====================================================
-
   useEffect(() => {
     const fetchOrder = async () => {
       try {
@@ -27,7 +23,6 @@ function OrderDetails() {
         if (res.data.success) {
           setOrder(res.data.data);
 
-          // Set current order status
           setStatus(res.data.data.orderStatus || "Pending");
         }
       } catch (error) {
@@ -41,10 +36,6 @@ function OrderDetails() {
 
     fetchOrder();
   }, [id]);
-
-  // =====================================================
-  // UPDATE ORDER STATUS
-  // =====================================================
 
   const handleStatusUpdate = async () => {
     if (!status) {
@@ -87,10 +78,6 @@ function OrderDetails() {
     }
   };
 
-  // =====================================================
-  // LOADING
-  // =====================================================
-
   if (loading) {
     return (
       <>
@@ -115,10 +102,6 @@ function OrderDetails() {
       </>
     );
   }
-
-  // =====================================================
-  // ORDER NOT FOUND
-  // =====================================================
 
   if (!order) {
     return (
@@ -155,43 +138,23 @@ function OrderDetails() {
     );
   }
 
-  // =====================================================
-  // PRICE
-  // =====================================================
-
   const subtotal = Number(order.subtotal || 0);
 
   const deduction = Number(order.deduction || 0);
 
   const total = Number(order.total || 0);
 
-  // =====================================================
-  // BILLING DETAILS
-  // =====================================================
-
   const billing = order.billingDetails || {};
-
-  // =====================================================
-  // PRODUCT PRICE
-  // =====================================================
 
   const getProductPrice = (product) => {
     return Number(product.price || product.offerPrice || product.mrp || 0);
   };
-
-  // =====================================================
-  // RETURN UI
-  // =====================================================
 
   return (
     <>
       <AdminHeader />
 
       <div className="home-section">
-        {/* =================================================
-            BREADCRUMB
-        ================================================= */}
-
         <div className="add-head">
           <i className="bi bi-house-door"></i>
 
@@ -210,10 +173,6 @@ function OrderDetails() {
 
           <span>Order Details</span>
         </div>
-
-        {/* =================================================
-            ORDER HEADER
-        ================================================= */}
 
         <div className="div_tab">
           <div className="table-sec">
@@ -245,8 +204,6 @@ function OrderDetails() {
                   gap: "25px",
                 }}
               >
-                {/* ORDER DATE */}
-
                 <div>
                   <strong>ORDER DATE</strong>
 
@@ -257,15 +214,11 @@ function OrderDetails() {
                   </p>
                 </div>
 
-                {/* PAYMENT */}
-
                 <div>
                   <strong>PAYMENT METHOD</strong>
 
                   <p>{order.paymentMethod || "N/A"}</p>
                 </div>
-
-                {/* STATUS */}
 
                 <div>
                   <strong>ORDER STATUS</strong>
@@ -276,10 +229,6 @@ function OrderDetails() {
             </div>
           </div>
         </div>
-
-        {/* =================================================
-            CUSTOMER DETAILS
-        ================================================= */}
 
         <div className="div_tab">
           <div className="table-sec">
@@ -299,8 +248,6 @@ function OrderDetails() {
                   gap: "25px",
                 }}
               >
-                {/* NAME */}
-
                 <div>
                   <strong>CUSTOMER NAME</strong>
 
@@ -309,15 +256,11 @@ function OrderDetails() {
                   </p>
                 </div>
 
-                {/* EMAIL */}
-
                 <div>
                   <strong>EMAIL</strong>
 
                   <p>{billing.email || "N/A"}</p>
                 </div>
-
-                {/* PHONE */}
 
                 <div>
                   <strong>PHONE NUMBER</strong>
@@ -325,15 +268,11 @@ function OrderDetails() {
                   <p>{billing.phone || "N/A"}</p>
                 </div>
 
-                {/* COMPANY */}
-
                 <div>
                   <strong>COMPANY NAME</strong>
 
                   <p>{billing.companyName || "N/A"}</p>
                 </div>
-
-                {/* ADDRESS */}
 
                 <div>
                   <strong>STREET ADDRESS</strong>
@@ -341,15 +280,11 @@ function OrderDetails() {
                   <p>{billing.streetAddress || "N/A"}</p>
                 </div>
 
-                {/* CITY */}
-
                 <div>
                   <strong>CITY</strong>
 
                   <p>{billing.city || "N/A"}</p>
                 </div>
-
-                {/* POSTCODE */}
 
                 <div>
                   <strong>POSTCODE / ZIP</strong>
@@ -360,10 +295,6 @@ function OrderDetails() {
             </div>
           </div>
         </div>
-
-        {/* =================================================
-            ORDER PRODUCTS
-        ================================================= */}
 
         <div className="div_tab">
           <div className="table-sec">
@@ -399,14 +330,12 @@ function OrderDetails() {
 
                       return (
                         <tr key={`${product._id}-${index}`}>
-                          {/* IMAGE */}
-
                           <td>
                             {product.image || product.images?.[0] ? (
                               <img
-                                src={`http://localhost:5000/uploads/${
-                                  product.image || product.images?.[0]
-                                }`}
+                                src={getImageUrl(
+                                  product.image || product.images?.[0],
+                                )}
                                 width="70"
                                 height="70"
                                 style={{
@@ -419,27 +348,15 @@ function OrderDetails() {
                             )}
                           </td>
 
-                          {/* PRODUCT */}
-
                           <td>{product.productTitle}</td>
-
-                          {/* COLOR */}
 
                           <td>{product.color || "N/A"}</td>
 
-                          {/* SIZE */}
-
                           <td>{product.size || "N/A"}</td>
-
-                          {/* PRICE */}
 
                           <td>${price.toFixed(2)}</td>
 
-                          {/* QUANTITY */}
-
                           <td>{quantity}</td>
-
-                          {/* TOTAL */}
 
                           <td>${(price * quantity).toFixed(2)}</td>
                         </tr>
@@ -462,10 +379,6 @@ function OrderDetails() {
             </div>
           </div>
         </div>
-
-        {/* =================================================
-            PAYMENT DETAILS
-        ================================================= */}
 
         <div className="div_tab">
           <div className="table-sec">
@@ -506,10 +419,6 @@ function OrderDetails() {
           </div>
         </div>
 
-        {/* =================================================
-            PRICE DETAILS
-        ================================================= */}
-
         <div className="div_tab">
           <div className="table-sec">
             <div className="head">
@@ -527,8 +436,6 @@ function OrderDetails() {
                   marginLeft: "auto",
                 }}
               >
-                {/* SUBTOTAL */}
-
                 <div
                   style={{
                     display: "flex",
@@ -542,8 +449,6 @@ function OrderDetails() {
 
                 <hr />
 
-                {/* DEDUCTION */}
-
                 <div
                   style={{
                     display: "flex",
@@ -556,8 +461,6 @@ function OrderDetails() {
                 </div>
 
                 <hr />
-
-                {/* TOTAL */}
 
                 <div
                   style={{
@@ -576,10 +479,6 @@ function OrderDetails() {
           </div>
         </div>
 
-        {/* =================================================
-            ORDER STATUS
-        ================================================= */}
-
         <div className="div_tab">
           <div className="table-sec">
             <div className="head">
@@ -591,8 +490,6 @@ function OrderDetails() {
                 padding: "25px",
               }}
             >
-              {/* CURRENT STATUS */}
-
               <div
                 style={{
                   marginBottom: "20px",
@@ -615,8 +512,6 @@ function OrderDetails() {
                     : "N/A"}
                 </p>
               </div>
-
-              {/* UPDATE STATUS */}
 
               <div
                 style={{
@@ -656,8 +551,6 @@ function OrderDetails() {
                   {updatingStatus ? "Updating..." : "Update Status"}
                 </button>
               </div>
-
-              {/* CANCELLED MESSAGE */}
 
               {order.orderStatus === "Cancelled" && (
                 <p
