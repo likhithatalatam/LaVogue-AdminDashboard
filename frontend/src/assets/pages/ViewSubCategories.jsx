@@ -81,9 +81,9 @@ function ViewSubCategories() {
                       <td>{new Date(cat.updatedAt).toLocaleDateString()}</td>
                       <td>
                         <div className="action">
-                          <Link to={`/editsubcategory/${cat._id}`}>
+                          <div>
                             <i className="bi bi-pencil-square"></i>
-                          </Link>
+                          </div>
                           <button
                             onClick={() => handleDelete(cat._id)}
                             className="delete_btn"

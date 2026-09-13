@@ -85,10 +85,9 @@ function AddSubCategory() {
                   <div className="Sub_Category">
                     <label>Sub-Category</label>
                     <input
-                      type="text"
-                      name="sub_category_name"
-                      value={subCategoryName}
-                      onChange={(e) => setsubCategoryName(e.target.value)}
+                      type="file"
+                      name="subCategoryImg"
+                      onChange={(e) => setsubCategoryImage(e.target.files[0])}
                     />
                   </div>
 
