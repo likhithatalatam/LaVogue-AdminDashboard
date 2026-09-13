@@ -80,9 +80,9 @@ function ViewCategories() {
 
                       <td>
                         <div className="action">
-                          <div>
+                          <Link to={`/editcategory/${cat._id}`}>
                             <i className="bi bi-pencil-square"></i>
-                          </div>
+                          </Link>
                           <button
                             onClick={() => handleDelete(cat._id)}
                             className="delete_btn"

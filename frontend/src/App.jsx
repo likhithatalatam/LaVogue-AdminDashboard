@@ -18,6 +18,7 @@ import ViewSubCategories from "./assets/pages/ViewSubCategories";
 import OrderDetails from "./assets/pages/OrderDetails";
 import HomeManagement from "./assets/pages/HomeManagement";
 import ContactMessages from "./assets/pages/ContactMessages";
+import EditCategory from "./assets/pages/EditCategory";
 
 function App() {
   return (
@@ -45,6 +46,8 @@ function App() {
           <Route path="/homemanagement" element={<HomeManagement />} />
 
           <Route path="/contactmessages" element={<ContactMessages />} />
+
+          <Route path="/editcategory/:id" element={<EditCategory />} />
 
           <Route path="/profile" element={<AdminProfile />} />
         </Route>
