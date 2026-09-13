@@ -8,11 +8,21 @@ export const BACKEND_URL = API_BASE_URL.replace(/\/api\/?$/, "");
 export const getImageUrl = (image) => {
   if (!image) return "";
 
-  if (image.startsWith("http")) {
-    return image.replace("http://localhost:5000", BACKEND_URL);
+  const imagePath = String(image).trim().replace(/\\/g, "/");
+
+  if (imagePath.startsWith("http://localhost:5000")) {
+    return imagePath.replace("http://localhost:5000", BACKEND_URL);
   }
 
-  const cleanImage = image.replace(/^\/?uploads\//, "");
+  if (imagePath.startsWith("https://lavogue-backend.onrender.com")) {
+    return imagePath;
+  }
+
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    return imagePath;
+  }
+
+  const cleanImage = imagePath.replace(/^\/+/, "").replace(/^uploads\/+/, "");
 
   return `${BACKEND_URL}/uploads/${cleanImage}`;
 };
