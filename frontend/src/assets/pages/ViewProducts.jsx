@@ -190,9 +190,9 @@ function ViewProducts() {
 
                       <td>
                         <div className="action">
-                          <div>
+                          <Link to={`/editproduct/${pro._id}`}>
                             <i className="bi bi-pencil-square"></i>
-                          </div>
+                          </Link>
 
                           <button
                             onClick={() => handleDelete(pro._id)}
