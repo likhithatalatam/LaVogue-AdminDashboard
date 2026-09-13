@@ -16,15 +16,12 @@ function AddProduct() {
   const [mrp, setmrp] = useState("");
   const [offerprice, setofferprice] = useState("");
 
-  const [images, setImages] = useState([]);
+  const [colorImages, setColorImages] = useState({});
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [brands, setBrands] = useState([]);
-
-  // =====================================================
-  // COLOR / SIZE / AVAILABILITY
-  // =====================================================
 
   const [variants, setVariants] = useState([
     {
@@ -33,10 +30,6 @@ function AddProduct() {
       availability: "",
     },
   ]);
-
-  // =====================================================
-  // FETCH CATEGORY / SUBCATEGORY / BRAND
-  // =====================================================
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,16 +42,63 @@ function AddProduct() {
         setSubcategories(subRes.data.data);
         setBrands(brandRes.data.data);
       } catch (error) {
-        console.log(error);
+        setErrorMessage(
+          error.response?.data?.message ||
+            "Unable to load categories, subcategories and brands.",
+        );
       }
     };
 
     fetchData();
   }, []);
 
-  // =====================================================
-  // HANDLE VARIANT CHANGE
-  // =====================================================
+  const uniqueColors = [
+    ...new Set(
+      variants.map((variant) => variant.color.trim()).filter((color) => color),
+    ),
+  ];
+
+  const removeColorImage = (color, index) => {
+    setColorImages((prev) => ({
+      ...prev,
+      [color]: (prev[color] || []).filter(
+        (_, imageIndex) => imageIndex !== index,
+      ),
+    }));
+
+    setErrorMessage("");
+  };
+
+  const handleColorImagesChange = (color, event) => {
+    const selectedFile = event.target.files?.[0];
+
+    if (!selectedFile) {
+      return;
+    }
+
+    if (!selectedFile.type.startsWith("image/")) {
+      setErrorMessage(`Please select an image file for ${color}.`);
+      event.target.value = "";
+      return;
+    }
+
+    const currentImages = colorImages[color] || [];
+
+    if (currentImages.length >= 5) {
+      setErrorMessage(`Maximum 5 images allowed for ${color}.`);
+      event.target.value = "";
+      return;
+    }
+
+    setErrorMessage("");
+
+    setColorImages((prev) => ({
+      ...prev,
+      [color]: [...(prev[color] || []), selectedFile],
+    }));
+
+    event.target.value = "";
+  };
 
   const handleVariantChange = (index, field, value) => {
     const updatedVariants = [...variants];
@@ -66,11 +106,33 @@ function AddProduct() {
     updatedVariants[index][field] = value;
 
     setVariants(updatedVariants);
-  };
 
-  // =====================================================
-  // ADD VARIANT
-  // =====================================================
+    if (field === "color") {
+      const oldColor = variants[index].color.trim();
+      const newColor = value.trim();
+
+      if (oldColor && oldColor !== newColor) {
+        setColorImages((prev) => {
+          const updatedImages = { ...prev };
+
+          if (updatedImages[oldColor]) {
+            if (updatedImages[newColor]) {
+              updatedImages[newColor] = [
+                ...updatedImages[newColor],
+                ...updatedImages[oldColor],
+              ].slice(0, 5);
+            } else {
+              updatedImages[newColor] = updatedImages[oldColor];
+            }
+
+            delete updatedImages[oldColor];
+          }
+
+          return updatedImages;
+        });
+      }
+    }
+  };
 
   const addVariant = () => {
     setVariants([
@@ -83,81 +145,176 @@ function AddProduct() {
     ]);
   };
 
-  // =====================================================
-  // REMOVE VARIANT
-  // =====================================================
-
   const removeVariant = (index) => {
     if (variants.length === 1) {
       return;
     }
 
-    const updatedVariants = variants.filter(
+    const colorToRemove = variants[index].color.trim();
+
+    const remainingVariants = variants.filter(
       (_, variantIndex) => variantIndex !== index,
     );
 
-    setVariants(updatedVariants);
+    setVariants(remainingVariants);
+
+    if (colorToRemove) {
+      const colorStillExists = remainingVariants.some(
+        (variant) => variant.color.trim() === colorToRemove,
+      );
+
+      if (!colorStillExists) {
+        setColorImages((prev) => {
+          const updatedImages = { ...prev };
+          delete updatedImages[colorToRemove];
+          return updatedImages;
+        });
+      }
+    }
   };
 
-  // =====================================================
-  // SUBMIT
-  // =====================================================
+  const isValidNumber = (value) => {
+    return /^\d+(\.\d+)?$/.test(value.trim());
+  };
 
   const handlesubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
 
-    // ===================================================
-    // VALIDATE VARIANTS
-    // ===================================================
+    const trimmedMrp = mrp.trim();
+    const trimmedOfferPrice = offerprice.trim();
+    const trimmedDiscount = discount.trim();
 
     const invalidVariant = variants.some(
       (variant) =>
         !variant.color.trim() ||
         !variant.size.trim() ||
-        variant.availability === "",
+        variant.availability === "" ||
+        !/^\d+$/.test(String(variant.availability).trim()),
     );
 
     if (invalidVariant) {
-      alert(
-        "Please enter color, size and availability for every product variant.",
+      setErrorMessage(
+        "Please enter valid color, size and availability for every product variant.",
       );
       return;
+    }
+
+    const duplicateVariants = new Set();
+
+    for (const variant of variants) {
+      const variantKey = `${variant.color.trim().toLowerCase()}-${variant.size.trim().toLowerCase()}`;
+
+      if (duplicateVariants.has(variantKey)) {
+        setErrorMessage(
+          "Duplicate color and size combinations are not allowed.",
+        );
+        return;
+      }
+
+      duplicateVariants.add(variantKey);
+    }
+
+    if (!isValidNumber(trimmedMrp)) {
+      setErrorMessage(
+        "MRP must contain only numbers. Example: 1000 or 999.99.",
+      );
+      return;
+    }
+
+    const mrpNumber = Number(trimmedMrp);
+
+    if (mrpNumber <= 0) {
+      setErrorMessage("MRP must be greater than 0.");
+      return;
+    }
+
+    if (trimmedOfferPrice && !isValidNumber(trimmedOfferPrice)) {
+      setErrorMessage(
+        "Offer Price must contain only numbers. Example: 900 or 899.99.",
+      );
+      return;
+    }
+
+    const offerPriceNumber = trimmedOfferPrice
+      ? Number(trimmedOfferPrice)
+      : null;
+
+    if (offerPriceNumber !== null && offerPriceNumber <= 0) {
+      setErrorMessage("Offer Price must be greater than 0.");
+      return;
+    }
+
+    if (offerPriceNumber !== null && offerPriceNumber > mrpNumber) {
+      setErrorMessage("Offer Price cannot be greater than MRP.");
+      return;
+    }
+
+    if (trimmedDiscount && !isValidNumber(trimmedDiscount)) {
+      setErrorMessage(
+        "Discount must contain only numbers. Example: 10 or 15.5.",
+      );
+      return;
+    }
+
+    if (trimmedDiscount) {
+      const discountNumber = Number(trimmedDiscount);
+
+      if (discountNumber < 0 || discountNumber > 100) {
+        setErrorMessage("Discount must be between 0 and 100.");
+        return;
+      }
+    }
+
+    for (const color of uniqueColors) {
+      const imagesForColor = colorImages[color] || [];
+
+      if (imagesForColor.length === 0) {
+        setErrorMessage(`Please upload at least one image for ${color}.`);
+        return;
+      }
+
+      if (imagesForColor.length > 5) {
+        setErrorMessage(`Maximum 5 images are allowed for ${color}.`);
+        return;
+      }
     }
 
     try {
       const formData = new FormData();
 
-      formData.append("productTitle", title);
-      formData.append("productDescription", description);
+      formData.append("productTitle", title.trim());
+      formData.append("productDescription", description.trim());
       formData.append("category", category);
       formData.append("subCategory", subcategory);
       formData.append("brand", brand);
 
-      // =================================================
-      // SEND VARIANTS
-      // =================================================
-
       formData.append("variants", JSON.stringify(variants));
 
-      formData.append("discount", discount);
-      formData.append("mrp", mrp);
-      formData.append("offerPrice", offerprice);
+      formData.append("discount", trimmedDiscount);
+      formData.append("mrp", trimmedMrp);
+      formData.append("offerPrice", trimmedOfferPrice);
 
-      // =================================================
-      // IMAGES
-      // =================================================
+      const colorImageMap = {};
+      let imageIndex = 0;
 
-      for (let i = 0; i < images.length; i++) {
-        formData.append("productImages", images[i]);
-      }
+      uniqueColors.forEach((color) => {
+        colorImageMap[color] = [];
+
+        const files = colorImages[color] || [];
+
+        files.forEach((file) => {
+          formData.append("productImages", file);
+          colorImageMap[color].push(imageIndex);
+          imageIndex++;
+        });
+      });
+
+      formData.append("colorImageMap", JSON.stringify(colorImageMap));
 
       const res = await API.post("/products", formData);
 
       alert(res.data.message);
-
-      // =================================================
-      // RESET FORM
-      // =================================================
 
       settitle("");
       setdescription("");
@@ -177,8 +334,16 @@ function AddProduct() {
       setmrp("");
       setofferprice("");
 
-      setImages([]);
+      setColorImages({});
+      setErrorMessage("");
     } catch (error) {
+      const backendMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Unable to add product. Please try again.";
+
+      setErrorMessage(backendMessage);
+
       console.log(error.response?.data || error);
     }
   };
@@ -205,9 +370,17 @@ function AddProduct() {
 
               <form onSubmit={handlesubmit}>
                 <div className="elements-div">
-                  {/* =====================================
-                      TITLE
-                  ===================================== */}
+                  {errorMessage && (
+                    <div
+                      style={{
+                        color: "red",
+                        marginBottom: "15px",
+                        fontSize: "14px",
+                      }}
+                    >
+                      {errorMessage}
+                    </div>
+                  )}
 
                   <div className="title">
                     <label>Title</label>
@@ -222,10 +395,6 @@ function AddProduct() {
                     />
                   </div>
 
-                  {/* =====================================
-                      DESCRIPTION
-                  ===================================== */}
-
                   <div className="title">
                     <label>Product Description</label>
 
@@ -237,10 +406,6 @@ function AddProduct() {
                       required
                     />
                   </div>
-
-                  {/* =====================================
-                      CATEGORY / SUBCATEGORY
-                  ===================================== */}
 
                   <div className="element-row">
                     <div className="element-column">
@@ -285,10 +450,6 @@ function AddProduct() {
                     </div>
                   </div>
 
-                  {/* =====================================
-                      BRAND
-                  ===================================== */}
-
                   <div className="element-row">
                     <div className="element-column">
                       <label>Product Brand</label>
@@ -309,10 +470,6 @@ function AddProduct() {
                     </div>
                   </div>
 
-                  {/* =====================================
-                      PRODUCT VARIANTS
-                  ===================================== */}
-
                   <div className="element-row">
                     <div className="element-column">
                       <label>Product Color / Size / Availability</label>
@@ -328,7 +485,6 @@ function AddProduct() {
                             flexWrap: "wrap",
                           }}
                         >
-                          {/* COLOR */}
                           <div className="varientchange">
                             <input
                               type="text"
@@ -344,8 +500,6 @@ function AddProduct() {
                               required
                             />
 
-                            {/* SIZE */}
-
                             <input
                               type="text"
                               placeholder="Size"
@@ -359,8 +513,6 @@ function AddProduct() {
                               }
                               required
                             />
-
-                            {/* AVAILABILITY */}
 
                             <input
                               type="number"
@@ -378,8 +530,6 @@ function AddProduct() {
                             />
                           </div>
 
-                          {/* REMOVE */}
-
                           {variants.length > 1 && (
                             <button
                               type="button"
@@ -391,24 +541,18 @@ function AddProduct() {
                         </div>
                       ))}
 
-                      {/* ADD VARIANT */}
-
                       <button type="button" onClick={addVariant}>
                         + Add Color / Size
                       </button>
                     </div>
                   </div>
 
-                  {/* =====================================
-                      DISCOUNT
-                  ===================================== */}
-
                   <div className="element-row">
                     <div className="element-column">
                       <label>Discount</label>
 
                       <input
-                        type="number"
+                        type="text"
                         name="discount"
                         value={discount}
                         onChange={(e) => setdiscount(e.target.value)}
@@ -416,26 +560,88 @@ function AddProduct() {
                     </div>
                   </div>
 
-                  {/* =====================================
-                      IMAGES
-                  ===================================== */}
-
                   <div className="element-row">
                     <div className="element-column">
                       <label>Product Image</label>
 
-                      <input
-                        type="file"
-                        multiple
-                        onChange={(e) => setImages(e.target.files)}
-                        required
-                      />
+                      {uniqueColors.length === 0 ? (
+                        <p>Please enter a product color first.</p>
+                      ) : (
+                        uniqueColors.map((color) => (
+                          <div key={color} style={{ marginBottom: "20px" }}>
+                            <label>{color}</label>
+
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) =>
+                                handleColorImagesChange(color, e)
+                              }
+                            />
+
+                            {colorImages[color]?.length > 0 && (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  gap: "10px",
+                                  flexWrap: "wrap",
+                                  marginTop: "10px",
+                                }}
+                              >
+                                {colorImages[color].map((file, index) => (
+                                  <div
+                                    key={index}
+                                    style={{ position: "relative" }}
+                                  >
+                                    <img
+                                      src={URL.createObjectURL(file)}
+                                      alt={`${color} ${index + 1}`}
+                                      style={{
+                                        width: "90px",
+                                        height: "90px",
+                                        objectFit: "cover",
+                                        borderRadius: "6px",
+                                        border: "1px solid #ccc",
+                                      }}
+                                    />
+
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        removeColorImage(color, index)
+                                      }
+                                      style={{
+                                        position: "absolute",
+                                        top: "-6px",
+                                        right: "-6px",
+                                        width: "22px",
+                                        height: "22px",
+                                        borderRadius: "50%",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        padding: 0,
+                                      }}
+                                    >
+                                      ×
+                                    </button>
+
+                                    <p
+                                      style={{
+                                        margin: "4px 0",
+                                        fontSize: "12px",
+                                      }}
+                                    >
+                                      Image {index + 1}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
-
-                  {/* =====================================
-                      MRP / OFFER PRICE
-                  ===================================== */}
 
                   <div className="element-row">
                     <div className="element-column">
@@ -461,10 +667,6 @@ function AddProduct() {
                       />
                     </div>
                   </div>
-
-                  {/* =====================================
-                      SUBMIT
-                  ===================================== */}
 
                   <div className="Submit-button">
                     <button type="submit">Submit</button>

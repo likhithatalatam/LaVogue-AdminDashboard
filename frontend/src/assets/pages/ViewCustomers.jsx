@@ -1,30 +1,69 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../css/global.css";
 import AdminHeader from "../common/Header";
 import Footer from "../common/Footer";
+import API from "../../api";
+
 function ViewCustomers() {
-  const users = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      mobile: "9876543210",
-      place: "Hyderabad",
-      created: "2024-01-10",
-    },
-    {
-      id: 2,
-      name: "Likhitha",
-      email: "likhitha@example.com",
-      mobile: "9123456789",
-      place: "Vijayawada",
-      created: "2024-02-12",
-    },
-  ];
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+
+      const res = await API.get("/users");
+
+      if (res.data.success) {
+        setUsers(res.data.data || []);
+      }
+    } catch (error) {
+      console.log("GET CUSTOMERS ERROR:", error);
+
+      alert(
+        error.response?.data?.message ||
+          "Failed to load customers. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this customer?",
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      const res = await API.delete(`/users/${id}`);
+
+      if (res.data.success) {
+        setUsers((prevUsers) => prevUsers.filter((user) => user._id !== id));
+
+        alert("Customer deleted successfully");
+      }
+    } catch (error) {
+      console.log("DELETE CUSTOMER ERROR:", error);
+
+      alert(
+        error.response?.data?.message ||
+          "Failed to delete customer. Please try again.",
+      );
+    }
+  };
 
   return (
     <>
       <AdminHeader />
+
       <div className="home-section">
         <div className="add-head">
           <i className="bi bi-house-door"></i>
@@ -53,34 +92,61 @@ function ViewCustomers() {
                 </thead>
 
                 <tbody>
-                  {users.map((user, index) => (
-                    <tr key={user.id}>
-                      <td>{index + 1}</td>
-                      <td>{user.name}</td>
-                      <td>{user.email}</td>
-                      <td>{user.mobile}</td>
-                      <td>{user.place}</td>
-                      <td>{user.created}</td>
-
-                      <td>
-                        <div className="action">
-                          <div>
-                            <i className="bi bi-pencil-square"></i>
-                          </div>
-
-                          <button className="delete_btn">
-                            <i className="bi bi-trash3"></i>
-                          </button>
-                        </div>
+                  {loading ? (
+                    <tr>
+                      <td colSpan="7" style={{ textAlign: "center" }}>
+                        Loading customers...
                       </td>
                     </tr>
-                  ))}
+                  ) : users.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" style={{ textAlign: "center" }}>
+                        No customers found
+                      </td>
+                    </tr>
+                  ) : (
+                    users.map((user, index) => (
+                      <tr key={user._id}>
+                        <td>{index + 1}</td>
+
+                        <td>{user.userName || "-"}</td>
+
+                        <td>{user.email || "-"}</td>
+
+                        <td>{user.phone || "-"}</td>
+
+                        <td>{user.location || "-"}</td>
+
+                        <td>
+                          {user.createdAt
+                            ? new Date(user.createdAt).toLocaleDateString()
+                            : "-"}
+                        </td>
+
+                        <td>
+                          <div className="action">
+                            <div>
+                              <i className="bi bi-pencil-square"></i>
+                            </div>
+
+                            <button
+                              className="delete_btn"
+                              onClick={() => handleDelete(user._id)}
+                            >
+                              <i className="bi bi-trash3"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
           </div>
         </div>
       </div>
+
       <Footer />
     </>
   );

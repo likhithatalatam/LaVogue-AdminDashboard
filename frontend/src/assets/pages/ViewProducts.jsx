@@ -106,19 +106,39 @@ function ViewProducts() {
                     <tr key={pro._id}>
                       <td>{index + 1}</td>
 
-                      <td>{pro.productTitle}</td>
+                      <td>
+                        <div
+                          style={{
+                            width: "180px",
+                            whiteSpace: "normal",
+                            overflowWrap: "break-word",
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {pro.productTitle}
+                        </div>
+                      </td>
 
-                      <td>{pro.productDescription}</td>
+                      <td>
+                        <div
+                          style={{
+                            width: "300px",
+                            maxWidth: "300px",
+                            whiteSpace: "normal",
+                            overflowWrap: "break-word",
+                            wordBreak: "break-word",
+                            lineHeight: "1.5",
+                          }}
+                        >
+                          {pro.productDescription}
+                        </div>
+                      </td>
 
                       <td>{pro.category?.categoryName}</td>
 
                       <td>{pro.subCategory?.subCategoryName}</td>
 
                       <td>{pro.brand?.brandName}</td>
-
-                      {/* =========================
-                          COLORS
-                      ========================= */}
 
                       <td>
                         {pro.variants?.length > 0
@@ -128,10 +148,6 @@ function ViewProducts() {
                           : "-"}
                       </td>
 
-                      {/* =========================
-                          SIZES
-                      ========================= */}
-
                       <td>
                         {pro.variants?.length > 0
                           ? pro.variants.map((variant, i) => (
@@ -139,10 +155,6 @@ function ViewProducts() {
                             ))
                           : "-"}
                       </td>
-
-                      {/* =========================
-                          AVAILABILITY
-                      ========================= */}
 
                       <td>
                         {pro.variants?.length > 0
@@ -153,10 +165,6 @@ function ViewProducts() {
                       </td>
 
                       <td>{pro.discount}</td>
-
-                      {/* =========================
-                          IMAGES
-                      ========================= */}
 
                       <td>
                         {pro.images?.map((img, i) => (
@@ -180,10 +188,6 @@ function ViewProducts() {
 
                       <td>{new Date(pro.updatedAt).toLocaleDateString()}</td>
 
-                      {/* =========================
-                          ACTION
-                      ========================= */}
-
                       <td>
                         <div className="action">
                           <div>
@@ -203,8 +207,6 @@ function ViewProducts() {
                 </tbody>
               </table>
             </div>
-
-            {/* Pagination */}
 
             <div className="page">
               <nav>
