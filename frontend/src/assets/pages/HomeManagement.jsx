@@ -15,15 +15,19 @@ function HomeManagement() {
 
   const [loading, setLoading] = useState(true);
 
-  // =====================================================
-  // FORM STATES
-  // =====================================================
-
   const [carouselFile, setCarouselFile] = useState(null);
   const [carouselTitle, setCarouselTitle] = useState("");
   const [carouselDescription, setCarouselDescription] = useState("");
   const [carouselLink, setCarouselLink] = useState("");
   const [carouselOrder, setCarouselOrder] = useState(0);
+
+  const [editingCarouselId, setEditingCarouselId] = useState(null);
+  const [editCarouselFile, setEditCarouselFile] = useState(null);
+  const [editCarouselTitle, setEditCarouselTitle] = useState("");
+  const [editCarouselDescription, setEditCarouselDescription] = useState("");
+  const [editCarouselLink, setEditCarouselLink] = useState("");
+  const [editCarouselOrder, setEditCarouselOrder] = useState(0);
+  const [editCarouselActive, setEditCarouselActive] = useState(true);
 
   const [bannerFile, setBannerFile] = useState(null);
   const [bannerTitle, setBannerTitle] = useState("");
@@ -100,6 +104,69 @@ function HomeManagement() {
 
       alert(error.response?.data?.message || "Failed to add carousel slide");
     }
+  };
+
+  const handleEditCarousel = (item) => {
+    setEditingCarouselId(item._id);
+    setEditCarouselFile(null);
+    setEditCarouselTitle(item.title || "");
+    setEditCarouselDescription(item.description || "");
+    setEditCarouselLink(item.link || "");
+    setEditCarouselOrder(item.order || 0);
+    setEditCarouselActive(item.isActive ?? true);
+  };
+
+  const handleUpdateCarousel = async (e) => {
+    e.preventDefault();
+
+    if (!editingCarouselId) return;
+
+    try {
+      const formData = new FormData();
+
+      if (editCarouselFile) {
+        formData.append("carouselImage", editCarouselFile);
+      }
+
+      formData.append("title", editCarouselTitle);
+      formData.append("description", editCarouselDescription);
+      formData.append("link", editCarouselLink);
+      formData.append("order", editCarouselOrder);
+      formData.append("isActive", String(editCarouselActive));
+
+      const res = await API.put(
+        `/home/carousel/${editingCarouselId}`,
+        formData,
+      );
+
+      if (res.data.success) {
+        alert("Carousel slide updated successfully");
+
+        setEditingCarouselId(null);
+        setEditCarouselFile(null);
+        setEditCarouselTitle("");
+        setEditCarouselDescription("");
+        setEditCarouselLink("");
+        setEditCarouselOrder(0);
+        setEditCarouselActive(true);
+
+        fetchHomeSettings();
+      }
+    } catch (error) {
+      console.log(error);
+
+      alert(error.response?.data?.message || "Failed to update carousel slide");
+    }
+  };
+
+  const cancelEditCarousel = () => {
+    setEditingCarouselId(null);
+    setEditCarouselFile(null);
+    setEditCarouselTitle("");
+    setEditCarouselDescription("");
+    setEditCarouselLink("");
+    setEditCarouselOrder(0);
+    setEditCarouselActive(true);
   };
 
   const handleAddBanner = async (e) => {
@@ -438,8 +505,6 @@ function HomeManagement() {
             </span>
           </div>
 
-          {/* ADD SLIDE */}
-
           <div style={formStyle}>
             <form onSubmit={handleAddCarousel}>
               <div style={gridStyle}>
@@ -547,45 +612,222 @@ function HomeManagement() {
                     .slice()
                     .sort((a, b) => a.order - b.order)
                     .map((item, index) => (
-                      <tr key={item._id}>
-                        <td>{index + 1}</td>
+                      <React.Fragment key={item._id}>
+                        {editingCarouselId === item._id && (
+                          <tr>
+                            <td colSpan="6">
+                              <form
+                                onSubmit={handleUpdateCarousel}
+                                style={{
+                                  padding: "18px",
+                                  background: "#fafafa",
+                                  border: "1px solid #eee",
+                                  borderRadius: "10px",
+                                }}
+                              >
+                                <h6
+                                  style={{
+                                    marginBottom: "18px",
+                                    color: "#333",
+                                  }}
+                                >
+                                  Edit Carousel Slide
+                                </h6>
 
-                        <td>
-                          <img
-                            src={getImageUrl(item.image)}
-                            alt={item.title || "Slide"}
-                            style={{
-                              width: "140px",
-                              height: "65px",
-                              objectFit: "cover",
-                              borderRadius: "6px",
-                            }}
-                          />
-                        </td>
+                                <div style={gridStyle}>
+                                  <div style={fieldStyle}>
+                                    <label>New Image</label>
 
-                        <td>{item.title || "Untitled Slide"}</td>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={(e) =>
+                                        setEditCarouselFile(e.target.files[0])
+                                      }
+                                    />
 
-                        <td>{item.order}</td>
+                                    <small
+                                      style={{
+                                        color: "#888",
+                                      }}
+                                    >
+                                      Leave empty to keep the current image.
+                                    </small>
+                                  </div>
 
-                        <td>
-                          <button
-                            onClick={() => toggleCarousel(item)}
-                            style={statusButtonStyle(item.isActive)}
-                          >
-                            {item.isActive ? "Active" : "Inactive"}
-                          </button>
-                        </td>
+                                  <div style={fieldStyle}>
+                                    <label>Title</label>
 
-                        <td>
-                          <button
-                            className="delete_btn"
-                            onClick={() => deleteCarousel(item._id)}
-                            title="Delete"
-                          >
-                            <i className="bi bi-trash3"></i>
-                          </button>
-                        </td>
-                      </tr>
+                                    <input
+                                      style={inputStyle}
+                                      type="text"
+                                      value={editCarouselTitle}
+                                      onChange={(e) =>
+                                        setEditCarouselTitle(e.target.value)
+                                      }
+                                    />
+                                  </div>
+
+                                  <div style={fieldStyle}>
+                                    <label>Description</label>
+
+                                    <input
+                                      style={inputStyle}
+                                      type="text"
+                                      value={editCarouselDescription}
+                                      onChange={(e) =>
+                                        setEditCarouselDescription(
+                                          e.target.value,
+                                        )
+                                      }
+                                    />
+                                  </div>
+
+                                  <div style={fieldStyle}>
+                                    <label>Link</label>
+
+                                    <input
+                                      style={inputStyle}
+                                      type="text"
+                                      value={editCarouselLink}
+                                      onChange={(e) =>
+                                        setEditCarouselLink(e.target.value)
+                                      }
+                                    />
+                                  </div>
+
+                                  <div style={fieldStyle}>
+                                    <label>Display Order</label>
+
+                                    <input
+                                      style={inputStyle}
+                                      type="number"
+                                      min="0"
+                                      value={editCarouselOrder}
+                                      onChange={(e) =>
+                                        setEditCarouselOrder(e.target.value)
+                                      }
+                                    />
+                                  </div>
+
+                                  <div style={fieldStyle}>
+                                    <label>Status</label>
+
+                                    <label
+                                      style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "8px",
+                                        marginTop: "8px",
+                                      }}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        checked={editCarouselActive}
+                                        onChange={(e) =>
+                                          setEditCarouselActive(
+                                            e.target.checked,
+                                          )
+                                        }
+                                      />
+                                      Active
+                                    </label>
+                                  </div>
+                                </div>
+
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    gap: "10px",
+                                    marginTop: "20px",
+                                  }}
+                                >
+                                  <button
+                                    type="submit"
+                                    style={{
+                                      ...primaryButtonStyle,
+                                      marginTop: 0,
+                                    }}
+                                  >
+                                    <i className="bi bi-check-lg"></i> Save
+                                    Changes
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={cancelEditCarousel}
+                                    style={{
+                                      padding: "10px 20px",
+                                      border: "1px solid #ddd",
+                                      borderRadius: "7px",
+                                      background: "#fff",
+                                      color: "#555",
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </form>
+                            </td>
+                          </tr>
+                        )}
+
+                        <tr>
+                          <td>{index + 1}</td>
+
+                          <td>
+                            <img
+                              src={getImageUrl(item.image)}
+                              alt={item.title || "Slide"}
+                              style={{
+                                width: "140px",
+                                height: "65px",
+                                objectFit: "cover",
+                                borderRadius: "6px",
+                              }}
+                            />
+                          </td>
+
+                          <td>{item.title || "Untitled Slide"}</td>
+
+                          <td>{item.order}</td>
+
+                          <td>
+                            <button
+                              onClick={() => toggleCarousel(item)}
+                              style={statusButtonStyle(item.isActive)}
+                            >
+                              {item.isActive ? "Active" : "Inactive"}
+                            </button>
+                          </td>
+
+                          <td>
+                            <button
+                              className="edit_btn"
+                              onClick={() => handleEditCarousel(item)}
+                              title="Edit"
+                              style={{
+                                border: "none",
+                                background: "transparent",
+                                color: "#a07adc",
+                                marginRight: "10px",
+                                cursor: "pointer",
+                              }}
+                            >
+                              <i className="bi bi-pencil-square"></i>
+                            </button>
+
+                            <button
+                              className="delete_btn"
+                              onClick={() => deleteCarousel(item._id)}
+                              title="Delete"
+                            >
+                              <i className="bi bi-trash3"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      </React.Fragment>
                     ))}
                 </tbody>
               </table>
@@ -714,7 +956,13 @@ function HomeManagement() {
                 Existing Banners
               </h6>
 
-              <table className="table table-striped" style={{ width: "100%" }}>
+              <table
+                className="table table-striped"
+                style={{
+                  width: "100%",
+                  verticalAlign: "middle",
+                }}
+              >
                 <thead>
                   <tr>
                     <th>#</th>
@@ -764,6 +1012,7 @@ function HomeManagement() {
                           <button
                             className="delete_btn"
                             onClick={() => deleteBanner(item._id)}
+                            title="Delete"
                           >
                             <i className="bi bi-trash3"></i>
                           </button>
@@ -908,6 +1157,7 @@ function HomeManagement() {
                         <button
                           className="delete_btn"
                           onClick={() => deleteCoupon(item._id)}
+                          title="Delete"
                         >
                           <i className="bi bi-trash3"></i>
                         </button>
