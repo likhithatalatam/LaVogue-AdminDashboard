@@ -75,9 +75,9 @@ function ViewBrand() {
                       <td>{new Date(brand.updatedAt).toLocaleDateString()}</td>
                       <td>
                         <div className="action">
-                          <div>
+                          <Link to={`/editbrand/${brand._id}`}>
                             <i className="bi bi-pencil-square"></i>
-                          </div>
+                          </Link>
 
                           <button
                             onClick={() => handleDelete(brand._id)}

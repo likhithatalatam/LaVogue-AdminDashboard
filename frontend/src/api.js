@@ -22,7 +22,11 @@ export const getImageUrl = (image) => {
     return imagePath;
   }
 
-  const cleanImage = imagePath.replace(/^\/+/, "").replace(/^uploads\/+/, "");
+  const cleanImage = imagePath.replace(/^\/+/, "").replace(/^uploads\//, "");
+
+  if (/^[a-f\d]{24}$/i.test(cleanImage)) {
+    return `${BACKEND_URL}/api/images/${cleanImage}`;
+  }
 
   return `${BACKEND_URL}/uploads/${cleanImage}`;
 };

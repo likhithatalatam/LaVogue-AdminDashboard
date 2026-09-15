@@ -2,52 +2,72 @@ import React, { useEffect, useState } from "react";
 import "../css/global.css";
 import AdminHeader from "../common/Header";
 import Footer from "../common/Footer";
-import { Link } from "react-router-dom";
-import API from "../../api";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import API, { getImageUrl } from "../../api";
 
-function AddSubCategory() {
-  const [subCategoryName, setsubCategoryName] = useState("");
-  const [subCategoryImg, setsubCategoryImage] = useState(null);
-  const [category, setcategoryID] = useState("");
+function EditSubCategory() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [subCategoryName, setSubCategoryName] = useState("");
+  const [subCategoryImg, setSubCategoryImg] = useState(null);
+  const [currentImage, setCurrentImage] = useState("");
+  const [category, setCategory] = useState("");
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    const fetchcategories = async () => {
+    const fetchData = async () => {
       try {
-        const res = await API.get("/categories");
-        setCategories(res.data.data);
+        const [subCategoryRes, categoryRes] = await Promise.all([
+          API.get("/subcategories"),
+          API.get("/categories"),
+        ]);
+
+        const subCategory = subCategoryRes.data.data.find(
+          (item) => item._id === id,
+        );
+
+        if (!subCategory) {
+          alert("SubCategory not found");
+          navigate("/subcategories");
+          return;
+        }
+
+        setSubCategoryName(subCategory.subCategoryName || "");
+        setCurrentImage(subCategory.subCategoryImg || "");
+        setCategory(subCategory.category?._id || subCategory.category || "");
+        setCategories(categoryRes.data.data || []);
       } catch (error) {
         console.log(error);
+        alert("Failed to load subcategory");
       }
     };
 
-    fetchcategories();
-  }, []);
+    fetchData();
+  }, [id, navigate]);
 
-  const handlesubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!subCategoryName || !subCategoryImg || !category) {
-      alert("All fields are required");
-      return;
-    }
 
     try {
       const formData = new FormData();
 
       formData.append("subCategoryName", subCategoryName);
-      formData.append("subCategoryImg", subCategoryImg);
       formData.append("category", category);
 
-      const res = await API.post("/subcategories", formData);
+      if (subCategoryImg) {
+        formData.append("subCategoryImg", subCategoryImg);
+      }
+
+      const res = await API.put(`/subcategories/${id}`, formData);
 
       alert(res.data.message);
 
-      setcategoryID("");
-      setsubCategoryName("");
-      setsubCategoryImage(null);
+      navigate("/subcategories");
     } catch (error) {
       console.log(error.response?.data);
+
+      alert(error.response?.data?.message || "Failed to update subcategory");
     }
   };
 
@@ -62,12 +82,12 @@ function AddSubCategory() {
           <Link to="/subcategories">View Sub-Categories</Link>
         </div>
 
-        <form onSubmit={handlesubmit}>
+        <form onSubmit={handleSubmit}>
           <div className="main-div">
             <div className="div">
               <div className="table-sec">
                 <div className="head">
-                  <h5>Add Sub-Categories</h5>
+                  <h5>Edit Sub-Categories</h5>
                 </div>
 
                 <div className="elements-div">
@@ -77,7 +97,7 @@ function AddSubCategory() {
 
                     <select
                       value={category}
-                      onChange={(e) => setcategoryID(e.target.value)}
+                      onChange={(e) => setCategory(e.target.value)}
                     >
                       <option value="">Select Category</option>
 
@@ -97,23 +117,34 @@ function AddSubCategory() {
                       name="subCategoryName"
                       placeholder="Sub-Category Name"
                       value={subCategoryName}
-                      onChange={(e) => setsubCategoryName(e.target.value)}
+                      onChange={(e) => setSubCategoryName(e.target.value)}
                     />
                   </div>
 
                   <div className="Sub_Category_img">
                     <label>Sub-Category image</label>
 
+                    {currentImage && (
+                      <div>
+                        <img
+                          src={getImageUrl(currentImage)}
+                          width="120"
+                          height="80"
+                          alt=""
+                        />
+                      </div>
+                    )}
+
                     <input
                       type="file"
                       name="subCategoryImg"
                       accept="image/*"
-                      onChange={(e) => setsubCategoryImage(e.target.files[0])}
+                      onChange={(e) => setSubCategoryImg(e.target.files[0])}
                     />
                   </div>
 
                   <div className="Submit-button">
-                    <button type="submit">Submit</button>
+                    <button type="submit">Update</button>
                   </div>
                 </div>
               </div>
@@ -127,4 +158,4 @@ function AddSubCategory() {
   );
 }
 
-export default AddSubCategory;
+export default EditSubCategory;
